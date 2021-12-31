@@ -1,5 +1,6 @@
 import "./App.css";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import Dropzone, { useDropzone } from "react-dropzone";
 import axios from "axios";
 
 const UserProfiles = () => {
@@ -19,12 +20,55 @@ const UserProfiles = () => {
   return userProfiles.map((userProfile, index) => {
     return (
       <div key={index}>
+        <br />
+        <br />
         <h1>{userProfile.username}</h1>
         <p>{userProfile.userProfileID}</p>
+        <MyDropzone {...userProfile} />
+        <br />
       </div>
     );
   });
 };
+
+function MyDropzone({ userProfileID }) {
+  const onDrop = useCallback((acceptedFiles) => {
+    const file = acceptedFiles[0];
+    console.log(file);
+
+    const formDataProfile = new FormData();
+    formDataProfile.append("file", file);
+
+    axios
+      .post(
+        `http://localhost:8080/api/v1/user-profile/${userProfileID}/image/upload`,
+        formDataProfile,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+      .then(() => {
+        console.log("file successfully uploaded");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }, []);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({ onDrop });
+
+  return (
+    <div {...getRootProps()}>
+      <input {...getInputProps()} />
+      {isDragActive ? (
+        <p>Drop the image here ...</p>
+      ) : (
+        <p>Drag 'n' drop profile image here, or click to select files</p>
+      )}
+    </div>
+  );
+}
 
 function App() {
   return (

@@ -2,6 +2,7 @@ package com.example.visualizer.algorithmVisualizer.profile;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +26,12 @@ public class UserProfileController {
         return userProfileService.getUserProfiles();
     }
 
-    public void uploadUserProfileImage(@PathVariable("userProfilId")UUID userProfilID,
+    @PostMapping(
+            path = "{userProfilID}/image/upload",
+            consumes  = MediaType.MULTIPART_FORM_DATA_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public void uploadUserProfileImage(@PathVariable("userProfilID")UUID userProfilID,
                                        @RequestParam("file")MultipartFile file){
         userProfileService.uploadUserProfileImage(userProfilID, file);
     }
